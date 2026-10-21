@@ -1,10 +1,42 @@
 # ERP para Escolas de Música
 
-## Sistema: NoteSystem
+Sistema: NoteSystem
 
-## Empresa: Oficina V12
+Empresa: Oficina V12
 
-## Integrantes: Angelo, Gabriel Martins e Jhulian
+Integrantes: Angelo, Gabriel Martins e Jhulian
+
+## Propostas de desenvolvimento:
+
+**O que é:** um sistema de gestão instalado no servidor da própria escola, voltado a escolas de música independentes (30 a 300 alunos). Cobre matrículas, turmas, agenda, presença, reposição e mensalidades, sem cobrança por aluno e com suporte humano. A escola de música é o primeiro nicho; o mesmo núcleo pode depois servir a escolas de idiomas, academias e reforço escolar.
+
+**Dores resolvidas:** hoje essas escolas vivem de planilha, caderno e WhatsApp. Faltam controle de inadimplência, uma grade sem conflitos, gestão de reposições e repasse a professores. Os sistemas genéricos não entendem aula individual, recesso ou comissão de professor.
+
+**Perfis:** administrador, professor, aluno/responsável e visitante (lead da landing page).
+
+**Módulos principais:**
+- Landing page editável, com formulário de aula experimental
+- Alunos e matrículas, com responsável legal e financeiro
+- Cursos, turmas, salas e agenda com detecção de conflito
+- Chamada pelo celular, faltas e créditos de reposição
+- Acompanhamento pedagógico (conteúdo, repertório, avaliações)
+- Financeiro: planos, descontos, cobranças automáticas, baixa manual, inadimplência e repasse de professores
+- Comunicação, eventos/recitais, relatórios e administração (backup, auditoria, LGPD)
+
+**Diferenciais de regra de negócio:** aula individual e coletiva convivem, a reposição tem validade configurável, a mensalidade é fixa por mês, há regras de recesso e trancamento, desconto por irmãos, responsável financeiro diferente do aluno, repasse flexível e cobrança unificada para quem faz mais de um curso.
+
+**Modelo comercial:**
+- Pacotes: Essencial, Gestão e Completo
+- Receitas: licença única, mensalidade de suporte, setup assistido e horas de customização
+- Upsell: gateway PIX/boleto, WhatsApp, contratos, PWA, certificados e aulas online
+
+**Fases de entrega:**
+1. **MVP:** landing, login, alunos, turmas, agenda, chamada, mensalidades manuais, inadimplência e backup
+2. **Fase 2:** reposição, repasse, área do aluno e relatórios
+3. **Fase 3:** eventos, instrumentos e funil completo
+4. **Fase 4:** integrações pagas
+
+# 
 
 To install dependencies:
 
