@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { BrowserRouter, Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import {
   Activity, AlertTriangle, ArrowDownRight, ArrowRight, ArrowUpRight,
   BarChart3, Bell, BookOpenCheck, Bot, BrainCircuit, CalendarDays,
@@ -13,6 +14,10 @@ import {
   initialClasses, initialEvaluations, initialGroups, initialNotifications,
   initialStudents, initialTransactions, revenueSeries, weekdays,
 } from "./data/demo.js";
+import { api, getCurrentUser } from "./services/api.js";
+import { useApiData } from "./hooks/useApiData.js";
+import { AdministrationPage, CommunicationPage, CoursesPage, EnrollmentPage, FinanceAdminPage, LandingPage, PedagogyPage, StudentPortalPage } from "./components/AdminPages.jsx";
+import { Avatar, Badge, EmptyState, Field, Logo, Modal, PageTitle, ProgressBar, StatCard } from "./components/ui.jsx";
 
 const NAV_ITEMS = [
   { id: "dashboard", label: "Visão geral", icon: LayoutDashboard, section: "COMANDO" },
@@ -22,6 +27,12 @@ const NAV_ITEMS = [
   { id: "finance", label: "Financeiro", icon: WalletCards },
   { id: "pedagogy", label: "Pedagógico", icon: BookOpenCheck, section: "ANÁLISE" },
   { id: "reports", label: "Relatórios", icon: BarChart3 },
+  { id: "enrollment", label: "Matrículas & responsáveis", icon: UserRoundCheck, section: "MÓDULOS" },
+  { id: "courses", label: "Cursos, turmas & salas", icon: GraduationCap },
+  { id: "pedagogy-hub", label: "Acompanhamento pedagógico", icon: BookOpenCheck },
+  { id: "finance-hub", label: "Planos & repasses", icon: WalletCards },
+  { id: "communication", label: "Comunicação & eventos", icon: MessageSquareText },
+  { id: "administration", label: "Administração & LGPD", icon: ShieldCheck },
 ];
 
 const VIEW_META = {
@@ -33,6 +44,12 @@ const VIEW_META = {
   pedagogy: ["Pedagógico", "Evolução e repertório"],
   reports: ["Relatórios", "Inteligência do negócio"],
   settings: ["Configurações", "Preferências do sistema"],
+  enrollment: ["Matrículas & responsáveis", "Cadastro completo"],
+  courses: ["Cursos, turmas & salas", "Estrutura e conflitos"],
+  "pedagogy-hub": ["Acompanhamento pedagógico", "Conteúdo e repertório"],
+  "finance-hub": ["Planos & repasses", "Operação financeira"],
+  communication: ["Comunicação & eventos", "Relacionamento com a comunidade"],
+  administration: ["Administração & LGPD", "Governança do ambiente"],
 };
 
 const money = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
@@ -48,90 +65,6 @@ function usePersistentState(key, fallback) {
     try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* storage unavailable */ }
   }, [key, value]);
   return [value, setValue];
-}
-
-function Logo({ compact = false }) {
-  return (
-    <div className={`brand ${compact ? "brand-compact" : ""}`}>
-      <span className="brand-mark" aria-hidden="true">
-        <Music2 size={22} strokeWidth={2.2} />
-        <i className="brand-node node-a" /><i className="brand-node node-b" />
-      </span>
-      {!compact && <span className="brand-type"><strong>NOTE<span>SYSTEM</span></strong><small>INTELLIGENT SCHOOL OS</small></span>}
-    </div>
-  );
-}
-
-function Badge({ children, tone = "neutral", dot = false }) {
-  return <span className={`badge badge-${tone}`}>{dot && <i />}{children}</span>;
-}
-
-function Avatar({ student, size = "md" }) {
-  return <span className={`avatar avatar-${student.color || "yellow"} avatar-${size}`}>{student.initials || student.name?.split(" ").map(n => n[0]).slice(0, 2).join("")}</span>;
-}
-
-function ProgressBar({ value, tone = "yellow", label }) {
-  return (
-    <div className="progress-wrap" aria-label={label || `${value}%`}>
-      <div className="progress-track"><span className={`progress-${tone}`} style={{ width: `${Math.min(100, Math.max(0, value))}%` }} /></div>
-      {label && <small>{label}</small>}
-    </div>
-  );
-}
-
-function PageTitle({ eyebrow, title, description, actions }) {
-  return (
-    <div className="page-title">
-      <div><span className="eyebrow"><i />{eyebrow}</span><h1>{title}</h1>{description && <p>{description}</p>}</div>
-      {actions && <div className="page-actions">{actions}</div>}
-    </div>
-  );
-}
-
-function StatCard({ label, value, delta, icon: Icon, tone = "yellow", detail, down = false }) {
-  return (
-    <article className={`stat-card border-glow-${tone}`}>
-      <div className="stat-top"><span className={`stat-icon text-${tone}`}><Icon size={19} /></span><Badge tone={down ? "red" : "green"}>{down ? <ArrowDownRight size={12} /> : <ArrowUpRight size={12} />}{delta}</Badge></div>
-      <strong className="stat-value">{value}</strong><span className="stat-label">{label}</span>
-      <div className="stat-detail">{detail}</div>
-    </article>
-  );
-}
-
-function EmptyState({ icon: Icon = Search, title, text, action }) {
-  return <div className="empty-state"><Icon size={28} /><strong>{title}</strong><p>{text}</p>{action}</div>;
-}
-
-function Modal({ title, subtitle, children, onClose, wide = false }) {
-  const panelRef = useRef(null);
-  useEffect(() => {
-    const previous = document.activeElement;
-    panelRef.current?.focus();
-    const handler = (event) => {
-      if (event.key === "Escape") onClose();
-      if (event.key === "Tab" && panelRef.current) {
-        const nodes = panelRef.current.querySelectorAll('button, input, select, textarea, [tabindex="0"]');
-        if (!nodes.length) return;
-        const first = nodes[0], last = nodes[nodes.length - 1];
-        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
-        else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
-      }
-    };
-    document.addEventListener("keydown", handler);
-    return () => { document.removeEventListener("keydown", handler); previous?.focus?.(); };
-  }, [onClose]);
-  return (
-    <div className="modal-backdrop" onMouseDown={e => e.target === e.currentTarget && onClose()}>
-      <section className={`modal-panel ${wide ? "modal-wide" : ""}`} role="dialog" aria-modal="true" aria-label={title} tabIndex={-1} ref={panelRef}>
-        <header><div><span className="eyebrow"><i />NOTE / INPUT</span><h2>{title}</h2>{subtitle && <p>{subtitle}</p>}</div><button className="icon-button" onClick={onClose} aria-label="Fechar"><X size={19} /></button></header>
-        {children}
-      </section>
-    </div>
-  );
-}
-
-function Field({ label, children, full = false, hint }) {
-  return <label className={`field ${full ? "field-full" : ""}`}><span>{label}</span>{children}{hint && <small>{hint}</small>}</label>;
 }
 
 function EntityModal({ modal, students, onClose, onSubmit }) {
@@ -361,8 +294,39 @@ function downloadFile(name, content, type) {
   setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
 
-export function App() {
-  const [view,setView]=useState("dashboard"); const [mobileNav,setMobileNav]=useState(false);
+function LoginView() {
+  const navigate = useNavigate();
+  const [form, setForm] = useState({ email: "admin@notesystem.local", password: "admin123" });
+  const [error, setError] = useState("");
+  const submit = async (event) => {
+    event.preventDefault();
+    try {
+      const { token } = await api.login(form);
+      localStorage.setItem("notesystem-token", token);
+      const user = getCurrentUser();
+      navigate(user?.role === "admin" ? "/dashboard" : user?.role === "teacher" ? "/pedagogy-hub" : "/student-home");
+    } catch (requestError) { setError(requestError.message); }
+  };
+  return <main className="view" style={{ maxWidth: 480, margin: "10vh auto" }}>
+    <section className="panel settings-panel"><Logo /><PageTitle eyebrow="ACESSO / NOTE SYSTEM" title="Entrar" description="Acesse o ambiente operacional da Oficina V12." />
+      <form className="entity-form" onSubmit={submit}><Field label="E-mail"><input type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></Field><Field label="Senha"><input type="password" required minLength={6} value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} /></Field>{error && <p className="text-red">{error}</p>}<button className="button button-primary" type="submit">Entrar</button></form><p style={{ marginTop: 20 }}>Ainda não conhece a escola? <a href="/landing" className="text-button">Agende uma aula experimental</a></p>
+    </section>
+  </main>;
+}
+
+function RoleRoute({ roles, children }) {
+  const user = getCurrentUser();
+  if (!user) return <Navigate to="/" replace />;
+  if (!roles.includes(user.role)) return <Navigate to={user.role === "teacher" ? "/pedagogy-hub" : user.role === "student" ? "/student-home" : "/dashboard"} replace />;
+  return children;
+}
+
+function WorkspaceApp() {
+  const routeNavigate = useNavigate();
+  const location = useLocation();
+  const view = location.pathname.slice(1) || "dashboard";
+  const { data: remoteData } = useApiData({ students: initialStudents, classes: initialClasses, transactions: initialTransactions, notifications: initialNotifications });
+  const [mobileNav,setMobileNav]=useState(false);
   const [students,setStudents]=usePersistentState("notesystem-students",initialStudents);
   const [classes,setClasses]=usePersistentState("notesystem-classes",initialClasses);
   const [groups,setGroups]=usePersistentState("notesystem-groups",initialGroups);
@@ -374,13 +338,32 @@ export function App() {
   const [search,setSearch]=useState(""); const [searchOpen,setSearchOpen]=useState(false); const [notificationsOpen,setNotificationsOpen]=useState(false); const [profileOpen,setProfileOpen]=useState(false);
   const [assistantOpen,setAssistantOpen]=useState(false); const [assistantInput,setAssistantInput]=useState(""); const [messages,setMessages]=useState([{from:"bot",text:"Olá, Gabriel. Sou o N.O.T.E., seu assistente operacional. Posso resumir alunos, agenda e finanças deste ambiente."}]);
   const [toast,setToast]=useState(null); const searchRef=useRef(null);
+  useEffect(() => {
+    if (!remoteData) return;
+    if (remoteData.students) setStudents(remoteData.students);
+    if (remoteData.classes) setClasses(remoteData.classes);
+    if (remoteData.transactions) setTransactions(remoteData.transactions);
+    if (remoteData.notifications) setNotifications(remoteData.notifications);
+  }, [remoteData]);
   const showToast=(text,tone="success")=>setToast({text,tone});
   useEffect(()=>{if(toast){const t=setTimeout(()=>setToast(null),3200);return()=>clearTimeout(t);}},[toast]);
   useEffect(()=>{const handler=e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==="k"){e.preventDefault();searchRef.current?.focus();setSearchOpen(true);}if(e.key==="Escape"){setSearchOpen(false);setNotificationsOpen(false);setProfileOpen(false);setSelectedStudent(null);setAssistantOpen(false);setMobileNav(false);}};window.addEventListener("keydown",handler);return()=>window.removeEventListener("keydown",handler);},[]);
-  const navigate=id=>{setView(id);setMobileNav(false);setSearchOpen(false);setSearch("");window.scrollTo({top:0,behavior:"smooth"});};
+  const navigate=id=>{routeNavigate(`/${id}`);setMobileNav(false);setSearchOpen(false);setSearch("");window.scrollTo({top:0,behavior:"smooth"});};
   const openModal=(type,data=null)=>setModal({type,data});
   const openStudent=s=>{setSelectedStudent(s);setSearchOpen(false);setSearch("");};
-  const handleSubmit=(type,form)=>{
+  const handleSubmit=async (type,form)=>{
+    const resource = { "new-student": "students", "edit-student": "students", "new-class": "classes", "new-group": "groups", "new-payment": "transactions", "new-evaluation": "evaluations" }[type];
+    if (localStorage.getItem("notesystem-token")) {
+      try {
+        const saved = type === "edit-student" ? await api.update(resource, form.id, form) : await api.create(resource, form);
+        if (resource === "students") setStudents((v) => type === "edit-student" ? v.map((item) => item.id === saved.id ? saved : item) : [saved, ...v]);
+        if (resource === "classes") setClasses((v) => [saved, ...v]);
+        if (resource === "groups") setGroups((v) => [saved, ...v]);
+        if (resource === "transactions") setTransactions((v) => [saved, ...v]);
+        if (resource === "evaluations") setEvaluations((v) => [saved, ...v]);
+        setModal(null); showToast("Registro sincronizado com a API."); return;
+      } catch (requestError) { showToast(requestError.message, "error"); return; }
+    }
     if(type==="new-student"){const item={...form,id:Date.now(),initials:form.name.split(" ").map(n=>n[0]).slice(0,2).join("").toUpperCase(),attendance:100,progress:0,nextClass:"Sem aula agendada",color:"yellow",level:form.level||"Iniciante",status:form.status||"Ativo"};setStudents(v=>[item,...v]);showToast(`${form.name} foi matriculado com sucesso.`);}
     if(type==="edit-student"){setStudents(v=>v.map(s=>s.id===form.id?{...s,...form}:s));setSelectedStudent(form);showToast("Dados do aluno atualizados.");}
     if(type==="new-class"){setClasses(v=>[...v,{...form,id:Date.now(),type:form.type||"Individual",status:"Pendente"}]);showToast(`Aula de ${form.student} agendada para ${form.start}.`);}
@@ -389,7 +372,7 @@ export function App() {
     if(type==="new-evaluation"){setEvaluations(v=>[{...form,id:Date.now()},...v]);showToast("Avaliação pedagógica registrada.");}
     setModal(null);
   };
-  const markPaid=id=>{setTransactions(v=>v.map(t=>t.id===id?{...t,status:"Pago"}:t));showToast("Pagamento baixado com sucesso.");};
+  const markPaid=async id=>{if(localStorage.getItem("notesystem-token")) await api.update("transactions", id, { status: "Pago" });setTransactions(v=>v.map(t=>t.id===id?{...t,status:"Pago"}:t));showToast("Pagamento baixado com sucesso.");};
   const resetData=()=>{setStudents(initialStudents);setClasses(initialClasses);setGroups(initialGroups);setTransactions(initialTransactions);setEvaluations(initialEvaluations);setNotifications(initialNotifications);setModal(null);showToast("Ambiente de demonstração restaurado.");};
   const exportBackup=()=>{downloadFile("notesystem-backup.json",JSON.stringify({students,classes,groups,transactions,evaluations,settings,exportedAt:new Date().toISOString()},null,2),"application/json");showToast("Backup JSON exportado.");};
   const searchResults=useMemo(()=>{const q=search.trim().toLowerCase();if(!q)return[];const people=students.filter(s=>`${s.name} ${s.course}`.toLowerCase().includes(q)).slice(0,4).map(s=>({type:"student",id:s.id,title:s.name,sub:`${s.course} · ${s.status}`,data:s}));const pages=NAV_ITEMS.filter(n=>n.label.toLowerCase().includes(q)).map(n=>({type:"page",id:n.id,title:n.label,sub:"Ir para módulo",icon:n.icon}));return[...people,...pages];},[search,students]);
@@ -421,6 +404,12 @@ export function App() {
         {view==="pedagogy"&&<PedagogyView students={students} evaluations={evaluations} {...common}/>} 
         {view==="reports"&&<ReportsView students={students} transactions={transactions} showToast={showToast}/>} 
         {view==="settings"&&<SettingsView settings={settings} setSettings={setSettings} onSave={()=>showToast("Preferências salvas neste navegador.")} onExport={exportBackup} onReset={()=>openModal("reset")}/>} 
+        {view==="enrollment"&&<EnrollmentPage students={students} openModal={openModal}/>}
+        {view==="courses"&&<CoursesPage openModal={openModal}/>}
+        {view==="pedagogy-hub"&&<PedagogyPage students={students} evaluations={evaluations} openModal={openModal}/>}
+        {view==="finance-hub"&&<FinanceAdminPage openModal={openModal}/>}
+        {view==="communication"&&<CommunicationPage openModal={openModal}/>}
+        {view==="administration"&&<AdministrationPage settings={settings} onExport={exportBackup}/>}
       </main>
       <footer className="app-footer"><span>NOTE SYSTEM © 2026</span><span><i/>AMBIENTE LOCAL · DADOS NESTE NAVEGADOR</span></footer>
     </div>
@@ -430,6 +419,16 @@ export function App() {
     {modal?.type==="reset"&&<Modal title="Restaurar demonstração?" subtitle="Esta ação substitui todos os dados locais pelos registros originais." onClose={()=>setModal(null)}><div className="confirm-content"><AlertTriangle size={30}/><p>Exporte um backup antes se quiser preservar as alterações feitas neste navegador.</p></div><footer className="modal-actions"><button className="button button-secondary" onClick={()=>setModal(null)}>Cancelar</button><button className="button button-danger" onClick={resetData}><RotateCcw size={16}/>Sim, restaurar</button></footer></Modal>}
     {toast&&<div className={`toast toast-${toast.tone}`} role="status"><CheckCircle2 size={19}/><span>{toast.text}</span><button onClick={()=>setToast(null)} aria-label="Fechar aviso"><X size={15}/></button></div>}
   </div>;
+}
+
+export function App() {
+  return <BrowserRouter><Routes>
+    <Route path="/" element={<LoginView />} />
+    <Route path="/login" element={<Navigate to="/" replace />} />
+    <Route path="/landing" element={<LandingPage onSubmit={async (lead) => { try { await api.createLead(lead); } catch { localStorage.setItem("notesystem-lead", JSON.stringify(lead)); } }} />} />
+    <Route path="/student-home" element={<RoleRoute roles={["student"]}><StudentPortalPage user={getCurrentUser()} /></RoleRoute>} />
+    <Route path="*" element={<RoleRoute roles={["admin", "teacher"]}><WorkspaceApp /></RoleRoute>} />
+  </Routes></BrowserRouter>;
 }
 
 export default App;

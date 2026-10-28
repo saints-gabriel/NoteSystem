@@ -44,6 +44,39 @@ To install dependencies:
 bun install
 ```
 
+## Desenvolvimento
+
+Em terminais separados, inicie a API e o frontend:
+
+```bash
+cd backend
+cp .env.example .env
+bun install
+bun run dev
+```
+
+```bash
+cd frontend
+bun install
+bun dev
+```
+
+A API usa SQLite local, cria as tabelas e carrega os dados iniciais automaticamente.
+O acesso inicial é `admin@notesystem.local` / `admin123`; altere esses valores no
+arquivo `backend/.env`. O frontend usa `VITE_API_URL` (padrão `http://localhost:3001`)
+para localizar a API.
+
+Rotas públicas:
+
+- `/` ou `/login`: login inicial com redirecionamento por papel.
+- `/landing`: Landing Page e formulário de aula experimental.
+
+Usuários de demonstração:
+
+- Administrador: `admin@notesystem.local` / `admin123`
+- Professor: `professor@notesystem.local` / `professor123`
+- Aluno: `aluno@notesystem.local` / `aluno123`
+
 To start a development server:
 
 ```bash
