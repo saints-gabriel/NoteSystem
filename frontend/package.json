@@ -1,6 +1,6 @@
 {
-  "name": "bun-react-template",
-  "version": "0.1.0",
+  "name": "notesystem-frontend",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -10,7 +10,9 @@
     "typecheck": "bun check"
   },
   "dependencies": {
+    "@fontsource/jetbrains-mono": "^5.2.6",
     "bun-plugin-tailwind": "^0.1.2",
+    "lucide-react": "^0.468.0",
     "react": "^19",
     "react-dom": "^19",
     "tailwindcss": "^4.1.11"
