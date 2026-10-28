@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { CalendarDays, CheckCircle2, Database, FileText, GraduationCap, Megaphone, Plus, Save, ShieldCheck, Users, WalletCards } from "lucide-react";
 import { Field, PageTitle, Badge } from "./ui.jsx";
+import { usePortalData } from "../hooks/usePortalData.js";
 
 export function LandingPage({ onSubmit }) {
   const [form, setForm] = useState({ name: "", email: "", phone: "", instrument: "" });
@@ -9,7 +10,11 @@ export function LandingPage({ onSubmit }) {
 }
 
 export function StudentPortalPage({ user }) {
-  return <main className="view"><PageTitle eyebrow="ÁREA DO ALUNO" title={`Olá, ${user?.name?.split(" ")[0] || "estudante"}.`} description="Acompanhe suas aulas, pagamentos e evolução em um só lugar." /><div className="stats-grid"><article className="stat-card border-glow-cyan"><strong className="stat-value">Próxima aula</strong><span className="stat-label">Hoje · 14:30</span><div className="stat-detail">Piano · Sala 01</div></article><article className="stat-card border-glow-green"><strong className="stat-value">86%</strong><span className="stat-label">Frequência</span><div className="stat-detail">Excelente presença</div></article><article className="stat-card border-glow-yellow"><strong className="stat-value">8,5</strong><span className="stat-label">Última avaliação</span><div className="stat-detail">Leitura rítmica</div></article></div><section className="panel landing-card"><div><span className="panel-kicker">MEU ACOMPANHAMENTO</span><h2>Continue praticando seu repertório.</h2><p>Seu professor atualizou seu plano de estudos. Consulte as próximas atividades e mantenha sua evolução.</p></div><button className="button button-primary"><CheckCircle2 size={16} />Ver atividades</button></section></main>;
+  const { data, loading } = usePortalData(user);
+  const student = data?.student;
+  const nextClass = data?.classes?.[0];
+  const evaluation = data?.evaluations?.[0];
+  return <main className="view"><PageTitle eyebrow="ÁREA DO ALUNO" title={`Olá, ${user?.name?.split(" ")[0] || "estudante"}.`} description="Dados carregados pela API para a sua conta." /><div className="stats-grid"><article className="stat-card border-glow-cyan"><strong className="stat-value">{loading ? "..." : nextClass?.start || "Sem aula"}</strong><span className="stat-label">Próxima aula</span><div className="stat-detail">{nextClass ? `${nextClass.course} · ${nextClass.room || "Sala a definir"}` : "Nenhuma aula agendada"}</div></article><article className="stat-card border-glow-green"><strong className="stat-value">{loading ? "..." : `${student?.attendance ?? 0}%`}</strong><span className="stat-label">Frequência</span><div className="stat-detail">{student?.course || "Matrícula ativa"}</div></article><article className="stat-card border-glow-yellow"><strong className="stat-value">{loading ? "..." : evaluation?.score || "—"}</strong><span className="stat-label">Última avaliação</span><div className="stat-detail">{evaluation?.title || "Ainda não avaliado"}</div></article></div><section className="panel landing-card"><div><span className="panel-kicker">MEU ACOMPANHAMENTO</span><h2>{student?.name || user?.name}</h2><p>{student?.email || user?.email} · {data?.transactions?.length || 0} cobranças na conta.</p></div><button className="button button-primary"><CheckCircle2 size={16} />Ver atividades</button></section></main>;
 }
 
 function ModulePage({ eyebrow, title, description, icon: Icon, items, action }) {

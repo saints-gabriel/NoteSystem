@@ -7,6 +7,7 @@ import authRoutes from "./routes/authRoutes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
 import recordRoutes from "./routes/recordRoutes.js";
 import publicRoutes from "./routes/publicRoutes.js";
+import portalRoutes from "./routes/portalRoutes.js";
 
 export function createApp() {
   const app = express();
@@ -15,6 +16,7 @@ export function createApp() {
   app.use(express.json({ limit: "1mb" }));
   app.get("/health", (_req, res) => res.json({ status: "ok" }));
   app.use("/api/public", publicRoutes);
+  app.use("/api/portal", portalRoutes);
   app.use("/api/auth", authRoutes);
   app.use("/api/dashboard", dashboardRoutes);
   app.use("/api", recordRoutes);

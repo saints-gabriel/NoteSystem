@@ -31,4 +31,5 @@ export const api = {
   update: (resource, id, data) => apiRequest(`/api/${resource}/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
   createLead: (data) => apiRequest("/api/public/leads", { method: "POST", body: JSON.stringify(data) }),
   me: () => apiRequest("/api/auth/me"),
+  portal: () => apiRequest("/api/portal"),
 };
