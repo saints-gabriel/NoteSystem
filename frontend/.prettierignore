@@ -1,0 +1,5 @@
+node_modules
+dist
+data
+bun.lock
+package-lock.json

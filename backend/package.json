@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "node --watch src/server.js",
-    "start": "node src/server.js"
+    "start": "node src/server.js",
+    "format": "prettier --write src",
+    "format:check": "prettier --check src"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
@@ -17,5 +19,8 @@
     "sequelize": "^6.37.5",
     "sqlite3": "^6.0.1",
     "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "prettier": "^3.9.10"
   }
 }

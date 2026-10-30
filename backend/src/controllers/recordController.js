@@ -1,17 +1,9 @@
-import { z } from "zod";
-import { findAllRecords, insertRecord, patchRecord } from "../models/recordModel.js";
+import * as recordService from "../services/recordService.js";
 
-export const resources = ["students", "classes", "groups", "transactions", "evaluations", "notifications", "leads", "courses", "rooms", "events", "audit"];
-const payloadSchema = z.record(z.string(), z.unknown());
-export async function list(req, res, next) {
-  try { return res.json(await findAllRecords(req.params.kind)); } catch (error) { return next(error); }
-}
-export async function create(req, res, next) {
-  try { return res.status(201).json(await insertRecord(req.params.kind, payloadSchema.parse(req.body))); } catch (error) { return next(error); }
-}
-export async function update(req, res, next) {
-  try {
-    const item = await patchRecord(Number(req.params.id), payloadSchema.parse(req.body));
-    return item ? res.json(item) : res.status(404).json({ error: "Registro não encontrado." });
-  } catch (error) { return next(error); }
-}
+export const list = async (req, res) => res.json(await recordService.list(req.resource.name));
+
+export const create = async (req, res) =>
+  res.status(201).json(await recordService.create(req.resource.name, req.body, req.user));
+
+export const update = async (req, res) =>
+  res.json(await recordService.update(req.resource.name, Number(req.params.id), req.body, req.user));

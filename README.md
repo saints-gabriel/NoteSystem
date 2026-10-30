@@ -36,6 +36,59 @@ Integrantes: Angelo, Gabriel Martins e Jhulian
 3. **Fase 3:** eventos, instrumentos e funil completo
 4. **Fase 4:** integrações pagas
 
+## Arquitetura
+
+### Backend (`backend/src`)
+
+Camadas, do request ao banco: `routes → middlewares → controllers → services → repositories → models`.
+
+| Pasta | Responsabilidade |
+| --- | --- |
+| `config/` | variáveis de ambiente (validadas com zod), conexão com o banco, locale do zod |
+| `constants/` | papéis (`roles.js`) e **registro de recursos** com permissões (`resources.js`) |
+| `models/` | modelos Sequelize (`User`, `Record`) |
+| `repositories/` | único ponto de acesso ao banco; trocar o armazenamento não afeta o resto |
+| `services/` | regras de negócio (finanças, dashboard, relatórios, portal, auditoria...) |
+| `controllers/` | traduzem HTTP ⇄ services (sem regra de negócio) |
+| `routes/` | mapa de endpoints; `routes/index.js` monta tudo |
+| `middlewares/` | autenticação, autorização por papel/recurso, validação, tratamento de erros |
+| `validators/` | schemas zod (um por recurso em `resourceSchemas.js`) |
+| `database/` | inicialização, `seeders.js` e dados de demonstração em `seeds/` |
+| `utils/` | datas, números, erros HTTP, token |
+
+**Adicionar um novo recurso CRUD** (ex.: `instruments`): 1) registre-o em `constants/resources.js`
+(com os papéis permitidos); 2) crie o schema em `validators/resourceSchemas.js`; 3) opcionalmente,
+adicione um seed em `database/seeds/`. As rotas `GET/POST /api/instruments` e `PATCH /api/instruments/:id`
+passam a existir, com validação, permissões e auditoria.
+
+Endpoints além do CRUD: `/api/dashboard`, `/api/finance/summary|payouts`, `/api/reports/:type`,
+`/api/reports/enrollment-mix`, `/api/settings`, `/api/portal`, `/api/admin/backup|reset-demo`,
+`/api/auth/login|me`, `/api/public/leads`.
+
+### Frontend (`frontend/src`)
+
+| Pasta | Responsabilidade |
+| --- | --- |
+| `app/` | rotas (`AppRoutes.jsx`) e proteção por papel (`RoleRoute.jsx`) |
+| `config/` | URL da API, papéis e **navegação** (`navigation.js`: menu, busca e breadcrumb) |
+| `services/` | cliente HTTP e um serviço por domínio; nenhum componente chama `fetch` |
+| `context/` | sessão, toasts, cache de recursos da API (`useResource`) e estado de UI do workspace |
+| `hooks/` | `useAsync`, `useKeydown`, `combineQueries` |
+| `components/ui` | componentes reutilizáveis (Badge, Modal, StatCard, AsyncContent...) |
+| `components/layout` | Sidebar, Topbar, busca global, notificações, perfil, layout do workspace |
+| `components/charts` | gráficos |
+| `features/*` | uma pasta por tela/módulo (dashboard, students, finance, ...) |
+| `features/forms` | formulários declarativos (`formConfigs.js`) |
+| `utils/` | formatação, datas e download |
+
+**Adicionar uma tela:** crie `features/<nome>/<Nome>Page.jsx`, registre a rota em `app/AppRoutes.jsx`
+e o item em `config/navigation.js`. **Adicionar um formulário:** descreva-o em `features/forms/formConfigs.js`
+e abra com `openForm("<tipo>")`. Nenhum dado é fixo no frontend: tudo vem da API.
+
+### Padronização
+
+`bun run format` / `npm run format` (Prettier) em `backend/` e `frontend/`; `format:check` valida.
+
 # 
 
 To install dependencies:
@@ -63,8 +116,9 @@ bun dev
 
 A API usa SQLite local, cria as tabelas e carrega os dados iniciais automaticamente.
 O acesso inicial é `admin@notesystem.local` / `admin123`; altere esses valores no
-arquivo `backend/.env`. O frontend usa `VITE_API_URL` (padrão `http://localhost:3001`)
-para localizar a API.
+arquivo `backend/.env`. O frontend usa `BUN_PUBLIC_API_URL` (padrão `http://localhost:3001`)
+para localizar a API. Com `SEED_DEMO_DATA=false` a API cria só o administrador (sem dados de demonstração).
+Para voltar aos dados de demonstração, apague `backend/data/` ou use Configurações → Restaurar dados (admin).
 
 Rotas públicas:
 
