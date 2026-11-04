@@ -1,0 +1,22 @@
+name: Tarefa Técnica / Manutenção
+description: Para rastrear trabalho interno, refatoração ou atualizações de infraestrutura.
+labels: ["task"]
+body:
+  - type: textarea
+    id: context
+    attributes:
+      label: Contexto
+      description: Por que esta tarefa é necessária agora?
+    validations:
+      required: true
+  - type: textarea
+    id: objectives
+    attributes:
+      label: Objetivos / Critérios de Conclusão
+      description: O que precisa ser feito para considerar esta tarefa concluída? (Use uma lista de verificação).
+      placeholder: |
+        - [ ] Atualizar a dependência X para a versão Y
+        - [ ] Ajustar os testes unitários
+        - [ ] Atualizar a documentação
+    validations:
+      required: true

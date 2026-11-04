@@ -1,0 +1,106 @@
+name: Reporte de Bug
+description: Reporte um bug reproduzível no projeto.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Antes de enviar:** pesquise nas issues e discussões abertas.
+        Relatos duplicados atrasam o processo.
+        
+        Para vulnerabilidades de segurança, **não abra uma issue pública** — use o GitHub Security Advisories.
+
+  - type: checkboxes
+    id: prerequisites
+    attributes:
+      label: Pré-requisitos
+      options:
+        - label: Pesquisei nas issues e discussões abertas e não encontrei um relato existente deste bug.
+          required: true
+        - label: Isto **não** é uma vulnerabilidade de segurança.
+          required: true
+        - label: Estou executando a versão mais recente do código da branch principal (`main` ou `dev`) e o bug ainda se reproduz.
+          required: true
+
+  - type: input
+    id: revision
+    attributes:
+      label: Versão/Commit do Projeto
+      description: |
+        Execute `git show -s --abbrev=12 --format='%h (%cs)' HEAD` no terminal e cole a saída exata.
+      placeholder: "Ex: 1fef4929cf1d (2026-11-05)"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: install-method
+    attributes:
+      label: Método de Instalação
+      options:
+        - "-- Selecione --"
+        - Docker (docker compose)
+        - Instalação Manual (pip / venv / npm)
+        - Executável Nativo (Windows / macOS)
+        - Outro (descreva nos passos de reprodução)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Sistema Operacional
+      options:
+        - "-- Selecione --"
+        - Linux
+        - macOS
+        - Windows
+        - Outro
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Passos para Reproduzir
+      description: Passos exatos que disparam o bug de forma confiável. Quanto mais específico, mais rápido será corrigido.
+      placeholder: |
+        1. Acesse a página/configuração X
+        2. Execute o comando Y
+        3. Observe o erro Z
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Comportamento Esperado
+      description: O que deveria ter acontecido?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Comportamento Atual
+      description: O que realmente aconteceu? Inclua a mensagem de erro completa, se houver.
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / Capturas de Tela
+      description: Cole a saída relevante do terminal ou anexe imagens. **Remova chaves de API, senhas e dados pessoais antes de enviar.**
+      render: shell
+
+  - type: dropdown
+    id: willing_to_fix
+    attributes:
+      label: Você está disposto a enviar uma correção (PR)?
+      options:
+        - "-- Selecione --"
+        - "Sim — Posso abrir um Pull Request"
+        - "Parcialmente — Posso ajudar, mas preciso de orientação"
+        - "Não — Estou apenas reportando o problema"
+    validations:
+      required: true

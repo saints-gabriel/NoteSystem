@@ -1,0 +1,79 @@
+name: Solicitação de Funcionalidade
+description: Proponha uma nova funcionalidade ou uma melhoria concreta no projeto.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Antes de enviar:** pesquise nas issues e discussões abertas.
+        Solicitações que duplicam o ROADMAP ou uma issue existente serão fechadas.
+        
+        Se sua ideia precisa de validação da comunidade antes de virar uma proposta concreta, abra uma **Discussão** primeiro.
+
+  - type: checkboxes
+    id: prerequisites
+    attributes:
+      label: Pré-requisitos
+      options:
+        - label: Pesquisei nas issues abertas e isso ainda não foi proposto.
+          required: true
+        - label: Pesquisei nas discussões e isso não está sendo debatido lá.
+          required: true
+        - label: Esta é uma proposta concreta e acionável, não apenas um desejo vago ("seria legal se...").
+          required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Área Afetada
+      description: Qual parte do projeto isso afeta?
+      options:
+        - "-- Selecione --"
+        - Interface do Usuário (Frontend)
+        - API / Backend
+        - Banco de Dados / Modelos
+        - Infraestrutura / CI/CD / Docker
+        - Documentação
+        - Outro
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problema ou Motivação
+      description: Qual problema isso resolve ou qual caso de uso isso possibilita? Seja específico.
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Solução Proposta
+      description: Descreva o comportamento ou mudança que você deseja ver. Inclua esboços de UI, fluxos de API ou trechos de código se isso ajudar a tornar a proposta concreta.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternativas Consideradas
+      description: Quais outras abordagens você considerou e por que as descartou? Se houver uma solução alternativa (workaround) atual, descreva-a.
+
+  - type: textarea
+    id: prior-art
+    attributes:
+      label: Referências / Issues Relacionadas
+      description: Link para discussões, issues ou referências externas que embasaram esta proposta.
+
+  - type: dropdown
+    id: willing_to_implement
+    attributes:
+      label: Você está disposto a implementar isso?
+      options:
+        - "-- Selecione --"
+        - "Sim — Posso abrir um Pull Request"
+        - "Parcialmente — Posso ajudar, mas preciso de orientação"
+        - "Não — Estou apenas fazendo a solicitação"
+    validations:
+      required: true
