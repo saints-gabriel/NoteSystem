@@ -1,5 +1,5 @@
-name: Reporte de Bug
-description: Reporte um bug reproduzível no projeto.
+name: Bug Report
+description: Comunique um bug reproduzível no projeto.
 labels: ["bug"]
 body:
   - type: markdown
@@ -39,8 +39,7 @@ body:
       options:
         - "-- Selecione --"
         - Docker (docker compose)
-        - Instalação Manual (pip / venv / npm)
-        - Executável Nativo (Windows / macOS)
+        - Instalação Manual (bun / npm)
         - Outro (descreva nos passos de reprodução)
     validations:
       required: true
