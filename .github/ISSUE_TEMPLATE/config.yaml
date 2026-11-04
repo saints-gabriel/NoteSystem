@@ -1,11 +1,11 @@
 blank_issues_enabled: false
 contact_links:
   - name: Pergunta ou Precisa de Ajuda
-    url: https://github.com/SEU-USUARIO/SEU-PROJETO/discussions/categories/q-a
+    url: https://github.com/saints-gabriel/NoteSystem/discussions/categories/q-a
     about: Tire dúvidas sobre configuração, uso e integração aqui. Issues são apenas para bugs confirmados e propostas concretas.
   - name: Ideia ou Sugestão Inicial
-    url: https://github.com/SEU-USUARIO/SEU-PROJETO/discussions/categories/ideas
+    url: https://github.com/saints-gabriel/NoteSystem/discussions/categories/ideas
     about: Discuta ideias e avalie o interesse da comunidade antes de abrir uma solicitação de funcionalidade formal.
   - name: Vulnerabilidade de Segurança
-    url: https://github.com/SEU-USUARIO/SEU-PROJETO/security/advisories/new
+    url: https://github.com/saints-gabriel/NoteSystem/security/advisories/new
     about: Relate vulnerabilidades de forma privada via GitHub Security Advisories. Nunca abra uma issue pública para isso.
