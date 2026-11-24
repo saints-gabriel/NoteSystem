@@ -42,7 +42,7 @@ export function LandingPage() {
         description="Agende uma aula experimental e conheça a Oficina V12."
       />
       <section className="panel landing-card">
-        <div>
+        <div className="mx-2">
           <span className="panel-kicker">AULA EXPERIMENTAL</span>
           <h2>Descubra seu próximo acorde.</h2>
           <p>Preencha o formulário e nossa equipe entrará em contato para encontrar o melhor horário.</p>
@@ -72,7 +72,7 @@ export function LandingPage() {
               {status.message}
             </div>
           )}
-          <button className="button button-primary" type="submit" disabled={status.state === "sending"}>
+          <button className="button button-primary my-3" type="submit" disabled={status.state === "sending"}>
             <CalendarDays size={16} />
             {status.state === "sending" ? "Enviando..." : "Solicitar aula"}
           </button>
