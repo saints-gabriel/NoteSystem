@@ -51,7 +51,7 @@ export function LoginPage() {
             />
           </Field>
           {error && <p className="text-red">{error}</p>}
-          <button className="button button-primary" type="submit" disabled={submitting}>
+          <button className="button button-primary my-3" type="submit" disabled={submitting}>
             {submitting ? "Entrando..." : "Entrar"}
           </button>
         </form>
